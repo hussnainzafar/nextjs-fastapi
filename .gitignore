@@ -1,0 +1,42 @@
+# Node.js (for Next.js)
+node_modules/
+.next/
+out/
+*.log
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python (for FastAPI)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+*.log
+instance/
+.env
+
+# Virtual environments
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# Misc
+*.sqlite3
+*.db
