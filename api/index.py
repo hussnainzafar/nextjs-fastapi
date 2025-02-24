@@ -49,6 +49,9 @@ import asyncio
 # Load environment variables
 load_dotenv()
 
+# Add this near the top of your file after imports
+print("NODE_ENV:", os.environ.get("NODE_ENV", "not set"))
+print("VERCEL_ENV:", os.environ.get("VERCEL_ENV", "not set"))
 
 app = FastAPI(
     docs_url="/api/py/docs",
@@ -658,3 +661,12 @@ async def get_job_status(task_id: str):
             detail=f"No status found for task ID: {task_id}"
         )
     return status
+
+# Or add this to your existing endpoints for testing
+@app.get("/api/py/env-check")
+async def check_environment():
+    return {
+        "NODE_ENV": os.environ.get("NODE_ENV", "not set"),
+        "VERCEL_ENV": os.environ.get("VERCEL_ENV", "not set"),
+        "IS_VERCEL": os.environ.get("VERCEL", "not set")
+    }
