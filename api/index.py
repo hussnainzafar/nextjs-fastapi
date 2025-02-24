@@ -519,7 +519,11 @@ async def process_page(
             }
         )
 
-@app.post("/crawl", response_model=CrawlResponse)
+@app.get("/api/py/helloFastApi")
+def hello_fast_api():
+    return {"message": "Hello from FastAPI"}
+
+@app.post("/api/py/crawl", response_model=CrawlResponse)
 async def start_crawl(crawl_request: CrawlRequest, background_tasks: BackgroundTasks):
     """Start a new crawling task."""
     try:
@@ -585,7 +589,7 @@ async def start_crawl(crawl_request: CrawlRequest, background_tasks: BackgroundT
             detail=f"Failed to start crawl: {str(e)}"
         )
 
-@app.get("/vector-store/info")
+@app.get("/api/py/vector-store/info")
 async def get_vector_store_info():
     try:
         vector_store = UpstashVectorStore(
@@ -603,7 +607,7 @@ async def get_vector_store_info():
             "message": f"Error accessing vector store: {str(e)}"
         }
 
-@app.get("/vector-store/search")
+@app.get("/api/py/vector-store/search")
 async def search_vector_store(query: str, limit: int = 5):
     try:
         vector_store = UpstashVectorStore(
@@ -633,7 +637,7 @@ async def search_vector_store(query: str, limit: int = 5):
         }
 
 # Add WebSocket endpoint for real-time status updates
-@app.websocket("/ws/{task_id}")
+@app.websocket("/api/py/ws/{task_id}")
 async def websocket_endpoint(websocket: WebSocket, task_id: str):
     """WebSocket endpoint for real-time status updates."""
     try:
@@ -652,7 +656,7 @@ async def websocket_endpoint(websocket: WebSocket, task_id: str):
         await job_manager.disconnect_client(task_id, websocket)
 
 # Add status check endpoint
-@app.get("/status/{task_id}")
+@app.get("/api/py/status/{task_id}")
 async def get_job_status(task_id: str):
     status = await job_manager.get_job_status(task_id)
     if not status:
