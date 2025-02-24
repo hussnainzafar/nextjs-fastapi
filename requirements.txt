@@ -1,2 +1,11 @@
-fastapi==0.115.0
-uvicorn[standard]==0.30.6
+upstash_vector
+scrapy==2.11.0
+langchain==0.1.0
+openai==1.7.2
+python-dotenv
+fastapi
+uvicorn
+httpx
+beautifulsoup4
+pydantic
+pyyaml
