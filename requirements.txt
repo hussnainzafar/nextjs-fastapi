@@ -1,7 +1,7 @@
 upstash_vector
 scrapy==2.11.0
 langchain==0.1.0
-openai==1.7.2
+openai
 python-dotenv
 fastapi
 uvicorn
