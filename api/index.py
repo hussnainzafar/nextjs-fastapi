@@ -100,10 +100,38 @@ class UpstashVectorStore:
             url (str): Upstash Vector REST API URL
             token (str): Upstash Vector REST API token
         """
-        self.client = OpenAI(
-            api_key=os.environ.get("OPENAI_API_KEY")
-        )
-        self.index = Index(url=url, token=token)
+        # Add debug logging
+        print("Debug: Initializing UpstashVectorStore")
+        print("Debug: OPENAI_API_KEY exists:", "Yes" if os.environ.get("OPENAI_API_KEY") else "No")
+        print("Debug: UPSTASH_VECTOR_REST_URL exists:", "Yes" if url else "No")
+        print("Debug: UPSTASH_VECTOR_REST_TOKEN exists:", "Yes" if token else "No")
+
+        # Explicitly check for environment variables
+        openai_api_key = os.environ.get("OPENAI_API_KEY")
+        if not openai_api_key:
+            raise ValueError("OPENAI_API_KEY environment variable is not set")
+
+        if not url:
+            raise ValueError("UPSTASH_VECTOR_REST_URL is not set")
+        
+        if not token:
+            raise ValueError("UPSTASH_VECTOR_REST_TOKEN is not set")
+
+        try:
+            self.client = OpenAI(
+                api_key=openai_api_key,
+            )
+            print("Debug: OpenAI client initialized successfully")
+        except Exception as e:
+            print(f"Debug: Error initializing OpenAI client: {str(e)}")
+            raise
+
+        try:
+            self.index = Index(url=url, token=token)
+            print("Debug: Upstash Vector index initialized successfully")
+        except Exception as e:
+            print(f"Debug: Error initializing Upstash Vector index: {str(e)}")
+            raise
 
     def get_embeddings(self, documents: List[str], model: str = "text-embedding-ada-002") -> List[List[float]]:
         try:
@@ -591,20 +619,60 @@ async def start_crawl(crawl_request: CrawlRequest, background_tasks: BackgroundT
 
 @app.get("/api/py/vector-store/info")
 async def get_vector_store_info():
+    """Get information about the vector store."""
     try:
+        # Debug logging for environment variables
+        env_vars = {
+            "OPENAI_API_KEY": bool(os.environ.get("OPENAI_API_KEY")),
+            "UPSTASH_VECTOR_REST_URL": bool(os.environ.get("UPSTASH_VECTOR_REST_URL")),
+            "UPSTASH_VECTOR_REST_TOKEN": bool(os.environ.get("UPSTASH_VECTOR_REST_TOKEN")),
+            "NODE_ENV": os.environ.get("NODE_ENV", "not set"),
+            "VERCEL_ENV": os.environ.get("VERCEL_ENV", "not set")
+        }
+        print("Debug: Environment variables status:", env_vars)
+
+        # Get required environment variables
+        upstash_url = os.environ.get("UPSTASH_VECTOR_REST_URL")
+        upstash_token = os.environ.get("UPSTASH_VECTOR_REST_TOKEN")
+        openai_api_key = os.environ.get("OPENAI_API_KEY")
+
+        # Check for missing environment variables
+        missing_vars = []
+        if not upstash_url:
+            missing_vars.append("UPSTASH_VECTOR_REST_URL")
+        if not upstash_token:
+            missing_vars.append("UPSTASH_VECTOR_REST_TOKEN")
+        if not openai_api_key:
+            missing_vars.append("OPENAI_API_KEY")
+
+        if missing_vars:
+            return {
+                "status": "error",
+                "message": f"Missing environment variables: {', '.join(missing_vars)}",
+                "environment": env_vars
+            }
+
+        # Initialize vector store
         vector_store = UpstashVectorStore(
-            url=os.environ.get("UPSTASH_VECTOR_REST_URL"),
-            token=os.environ.get("UPSTASH_VECTOR_REST_TOKEN")
+            url=upstash_url,
+            token=upstash_token
         )
+        
+        # Get store info
         info = vector_store.index.info()
+        
         return {
             "status": "success",
-            "info": info
+            "info": info,
+            "environment": env_vars
         }
+        
     except Exception as e:
+        print(f"Debug: Error in get_vector_store_info: {str(e)}")
         return {
             "status": "error",
-            "message": f"Error accessing vector store: {str(e)}"
+            "message": f"Error accessing vector store: {str(e)}",
+            "environment": env_vars
         }
 
 @app.get("/api/py/vector-store/search")
