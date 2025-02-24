@@ -49,7 +49,10 @@ import asyncio
 # Load environment variables
 load_dotenv()
 
+
 app = FastAPI(
+    docs_url="/api/py/docs",
+    openapi_url="/api/py/openapi.json",
     title="Anablock Crawler",
     description="Web crawler service with vector storage capabilities",
     version="1.0.0"
