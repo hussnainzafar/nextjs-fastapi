@@ -547,10 +547,6 @@ async def process_page(
             }
         )
 
-@app.get("/api/py/helloFastApi")
-def hello_fast_api():
-    return {"message": "Hello from FastAPI"}
-
 @app.post("/api/py/crawl", response_model=CrawlResponse)
 async def start_crawl(crawl_request: CrawlRequest, background_tasks: BackgroundTasks):
     """Start a new crawling task."""
